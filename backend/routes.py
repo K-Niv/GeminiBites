@@ -1,12 +1,16 @@
 import os
 import requests
 from app import app, db
-from flask import request, jsonify
+from flask import request, jsonify, make_response
 from models import User, Recipe, Tutorial
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from flask_jwt_extended import (
+    create_access_token, jwt_required, get_jwt_identity,
+    set_access_cookies, unset_jwt_cookies, current_user
+)
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+import datetime
 
 # Gemini setup
 import google.generativeai as genai
@@ -144,7 +148,12 @@ def create_user():
         db.session.add(new_user)
         db.session.commit()
 
-        return jsonify({"msg": "User created!"}), 201
+        # Create token after user is committed
+        token = create_access_token(identity=str(new_user.id))
+        # Create response and set cookie
+        response = jsonify({"msg": "User created!", "user": new_user.to_json()})
+        set_access_cookies(response, token)  # Set the HttpOnly cookie
+        return response, 201
 
     except Exception as e:
         db.session.rollback()
@@ -166,16 +175,36 @@ def login():
         if not user or not check_password_hash(user.password, password):
             return jsonify({"error": "Invalid email or password"}), 401
 
-        # Convert user.id to string when creating token
+        # Create token
         token = create_access_token(identity=str(user.id))
-        return jsonify({
+        # Create response and set cookie
+        response = jsonify({
             "msg": "Login successful",
-            "token": token,
             "user": user.to_json()
         })
+        set_access_cookies(response, token)  # Set the HttpOnly cookie
+        return response
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+
+@app.route('/api/logout', methods=['POST'])
+def logout():
+    response = jsonify({"msg": "Logout successful"})
+    unset_jwt_cookies(response)  # Clear the HttpOnly cookie
+    return response
+
+
+@app.route('/api/check_auth', methods=['GET'])
+@jwt_required()
+def check_auth():
+    user_id = get_jwt_identity()
+    user = User.query.get(user_id)
+    if user:
+        return jsonify({"logged_in": True, "user": user.to_json()})
+    else:
+        return jsonify({"logged_in": False}), 404
 
 
 @app.route('/api/user', methods=["GET"])
