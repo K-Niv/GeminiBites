@@ -3,6 +3,11 @@
 GeminiBites is an AI-powered kitchen companion application that helps users discover personalized recipes based on available ingredients, dietary preferences, and desired dishes.
 
 ![GeminiBites Application](./screenshots/preview.png)
+![GeminiBites Application](./screenshots/Image-1.png)
+![GeminiBites Application](./screenshots/Image-2.png)
+![GeminiBites Application](./screenshots/Image-3.png)
+![GeminiBites Application](./screenshots/Image-4.png)
+
 
 ## Features
 
@@ -14,7 +19,7 @@ GeminiBites is an AI-powered kitchen companion application that helps users disc
 
 ## Technology Stack
 
-- **Frontend**: React.js with CSS for styling
+- **Frontend**: React.js with Tailwind for styling
 - **Backend**: Flask (Python)
 - **AI Integration**: Google's Gemini AI for recipe generation
 - **Authentication**: JWT-based authentication system
