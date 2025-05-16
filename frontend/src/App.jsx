@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import HeroSection from './components/HeroSection';
 import MainPage from './components/MainPage'; // Create this component next
+import PreviousRecipesPage from './components/PreviousRecipesPage';
+import FavoriteRecipesPage from './components/FavoriteRecipesPage';
 
 function App() {
     // Basic check for login status (can be improved with context/state management)
@@ -22,6 +24,8 @@ function App() {
                 {/* MainPage is protected (example, needs real auth check) */}
                 {/* You'd typically wrap this in a component that checks auth */}
                 <Route path="/main" element={<MainPage />} /> 
+                <Route path="/previous-recipes" element={<PreviousRecipesPage />} />
+                <Route path="/favorites" element={<FavoriteRecipesPage />} />
 
                 {/* Redirect any other path to home */}
                 <Route path="*" element={<Navigate to="/" />} />
